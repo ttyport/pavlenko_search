@@ -2,11 +2,11 @@ from aiogram import Bot, Dispatcher, executor, types
 from googleapiclient.discovery import build
 from datetime import datetime
 
-api = "AIzaSyB45PhQYdtdE2zk7Ca-LQw7mqym_uEoG0Q"
+api = "token"
 
 youtube = build('youtube', 'v3', developerKey=api)
 
-bot = Bot(token="1261702412:AAGoMhWYOWUqMvc5lqGpMI3qPIkjdoU-qkk")
+bot = Bot(token="token")
 
 last_update = None
 
