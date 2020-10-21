@@ -38,9 +38,10 @@ async def search_handler(message: types.Message):
         if last_update is None:
             update_videos()
 
-        since_update_str = str(datetime.now() - last_update)
+        since_update = datetime.now() - last_update
 
-        if int(since_update_str[:since_update_str.index(":")]) >= 1:
+        # if haven't been updated in 24 hours
+        if since_update.total_seconds() >= 60 * 60 * 24:
             update_videos()
 
         reply = search_engine(message.text)
