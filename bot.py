@@ -3,27 +3,22 @@ from googleapiclient.discovery import build
 from datetime import datetime
 
 api = "token"
-
 youtube = build('youtube', 'v3', developerKey=api)
 
 bot = Bot(token="token")
+dp = Dispatcher(bot)
 
 last_update = None
-
 videos = {}
-
-dp = Dispatcher(bot)
 
 
 @dp.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-
     await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.")
 
 
 @dp.message_handler(commands=['help'])
 async def help(message: types.Message):
-
     await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.\n"
                         "Использование:\n"
                         "/search <то, что хотите найти>\n"
@@ -32,7 +27,6 @@ async def help(message: types.Message):
 
 @dp.message_handler(commands=['search'])
 async def search(message: types.Message):
-
     try:
         global last_update
 
@@ -47,13 +41,10 @@ async def search(message: types.Message):
         reply = search_engine(message.text)
 
         if reply != "empty":
-
             if len(reply) != 0 and reply != "empty":
                 await message.reply(search_engine(message.text), parse_mode="MarkdownV2", disable_web_page_preview=True)
-
             else:
                 await message.reply("К сожалению, ничего не нашлось...")
-
         else:
             await message.reply("Вы отправили пустое сообщение.")
 
@@ -69,35 +60,27 @@ def search_engine(text):
 
     if "/search" in text and "/search@pavlenko_search_bot" not in text:
         text = text[8:]
-
     elif "/search@pavlenko_search_bot" in text:
         text = text[28:]
 
     if len(text) > 0:
-
         str_to_return = str()
-
         for key in videos.keys():
-
             if text.lower() in key.lower():
                 key1 = key
 
                 for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
-
                     if char in key:
                         key_list = key1.split(char)
                         key1 = f'\\{char}'.join(_ for _ in key_list)
 
                 str_to_return = str_to_return + \
                     f"[{key1}]" + f"({videos[key]})" + "\n\n"
-
         return str_to_return
-
     return "empty"
 
 
 def update_videos():
-
     global last_update, videos
 
     res = youtube.channels().list(id="UC_hvS-IJ_SY04Op14v3l4Lg",
@@ -108,14 +91,11 @@ def update_videos():
     new_videos = {}
 
     while 1:
-
         res = youtube.playlistItems().list(playlistId=playlist_id,
                                            part='snippet',
                                            maxResults=50,
                                            pageToken=next_page_token).execute()
-
         for i in range(len(res["items"])):
-
             video_id = res["items"][i]["snippet"]["resourceId"]["videoId"]
             video_name = res["items"][i]['snippet']['title']
             new_videos[video_name] = f"https://www.youtube.com/watch?v={video_id}"
@@ -133,7 +113,6 @@ def update_videos():
 
 def shield(text):
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
-
         if char in text:
             key_list = text.split(char)
             text = f'\\{char}'.join(_ for _ in key_list)
