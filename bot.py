@@ -47,8 +47,10 @@ async def search_handler(message: types.Message):
         reply = search_engine(message.text)
 
         if reply != "empty":
-            if len(reply) != 0 and reply != "empty":
-                await message.reply(search_engine(message.text), parse_mode="MarkdownV2", disable_web_page_preview=True)
+            if len(reply) != 0:
+                await message.reply(search_engine(message.text),
+                                    parse_mode="MarkdownV2",
+                                    disable_web_page_preview=True)
             else:
                 await message.reply(config.NO_RESULTS_MESSAGE)
         else:
