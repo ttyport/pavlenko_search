@@ -46,8 +46,9 @@ async def search(message: types.Message):
             await message.reply(config.EMPTY_REQUEST_MESSAGE)
 
     except Exception as e:
-        await bot.send_message("473513901", shield(str(e)))
-        await bot.send_message("391043684", shield(str(e)))
+        for owner in config.BOT_OWNERS:
+            await bot.send_message(owner, shield(str(e)))
+
         print(e)
 
         error_msg = shield(str(e))
@@ -69,7 +70,7 @@ def search_engine(text):
         if text.lower() in key.lower():
             key1 = shield(key)
             to_return += f"[{key1}]({videos[key]})\n\n"
-            
+
     return to_return
 
 
