@@ -2,22 +2,22 @@ from aiogram import Bot, Dispatcher, executor, types
 from googleapiclient.discovery import build
 from datetime import datetime
 
-api = "token"
-youtube = build('youtube', 'v3', developerKey=api)
+API_TOKEN = "token"
+youtube = build('youtube', 'v3', developerKey=API_TOKEN)
 
 bot = Bot(token="token")
-dp = Dispatcher(bot)
+bot_dispatcher = Dispatcher(bot)
 
 last_update = None
 videos = {}
 
 
-@dp.message_handler(commands=['start'])
+@bot_dispatcher.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
     await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.")
 
 
-@dp.message_handler(commands=['help'])
+@bot_dispatcher.message_handler(commands=['help'])
 async def help(message: types.Message):
     await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.\n"
                         "Использование:\n"
@@ -25,7 +25,7 @@ async def help(message: types.Message):
                         "@Zhoprozhag - админ")
 
 
-@dp.message_handler(commands=['search'])
+@bot_dispatcher.message_handler(commands=['search'])
 async def search(message: types.Message):
     try:
         global last_update
@@ -57,7 +57,6 @@ async def search(message: types.Message):
 
 
 def search_engine(text):
-
     if "/search" in text and "/search@pavlenko_search_bot" not in text:
         text = text[8:]
     elif "/search@pavlenko_search_bot" in text:
@@ -120,4 +119,4 @@ def shield(text):
 
 
 if __name__ == "__main__":
-    executor.start_polling(dp)
+    executor.start_polling(bot_dispatcher)
