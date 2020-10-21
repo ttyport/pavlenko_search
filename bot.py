@@ -88,7 +88,8 @@ def search_engine(text):
                         key_list = key1.split(char)
                         key1 = f'\\{char}'.join(_ for _ in key_list)
 
-                str_to_return = str_to_return + f"[{key1}]" + f"({videos[key]})" + "\n\n"
+                str_to_return = str_to_return + \
+                    f"[{key1}]" + f"({videos[key]})" + "\n\n"
 
         return str_to_return
 
@@ -128,6 +129,7 @@ def update_videos():
     videos = new_videos
 
     return new_videos
+
 
 def shield(text):
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
