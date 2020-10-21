@@ -102,10 +102,10 @@ def update_videos():
                                            part='snippet',
                                            maxResults=50,
                                            pageToken=next_page_token).execute()
-        for i in range(len(res["items"])):
-            video_id = res["items"][i]["snippet"]["resourceId"]["videoId"]
-            video_name = res["items"][i]['snippet']['title']
-            new_videos[video_name] = f"https://www.youtube.com/watch?v={video_id}"
+        for item in res['items']:
+            video_id = item['snippet']['resourceId']['videoId']
+            video_title = item['snippet']['title']
+            new_videos[video_title] = f"https://www.youtube.com/watch?v={video_id}"
 
         next_page_token = res.get('nextPageToken')
 
