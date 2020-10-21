@@ -110,9 +110,7 @@ def update_videos():
 
 def shield(text):
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
-        if char in text:
-            key_list = text.split(char)
-            text = f'\\{char}'.join(_ for _ in key_list)
+        text = text.replace(char, '\\' + char)
     return text
 
 
