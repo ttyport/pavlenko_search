@@ -1,11 +1,11 @@
 from aiogram import Bot, Dispatcher, executor, types
 from googleapiclient.discovery import build
 from datetime import datetime
+import config
 
-API_TOKEN = "token"
-youtube = build('youtube', 'v3', developerKey=API_TOKEN)
+youtube = build('youtube', 'v3', developerKey=config.API_KEY)
 
-bot = Bot(token="token")
+bot = Bot(token=config.BOT_TOKEN)
 bot_dispatcher = Dispatcher(bot)
 
 last_update = None
@@ -14,15 +14,12 @@ videos = {}
 
 @bot_dispatcher.message_handler(commands=['start'])
 async def send_welcome(message: types.Message):
-    await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.")
+    await message.reply(config.WELCOME_MESSAGE)
 
 
 @bot_dispatcher.message_handler(commands=['help'])
 async def help(message: types.Message):
-    await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.\n"
-                        "Использование:\n"
-                        "/search <то, что хотите найти>\n"
-                        "@Zhoprozhag - админ")
+    await message.reply(config.HELP_MESSAGE)
 
 
 @bot_dispatcher.message_handler(commands=['search'])
@@ -44,16 +41,18 @@ async def search(message: types.Message):
             if len(reply) != 0 and reply != "empty":
                 await message.reply(search_engine(message.text), parse_mode="MarkdownV2", disable_web_page_preview=True)
             else:
-                await message.reply("К сожалению, ничего не нашлось...")
+                await message.reply(config.NO_RESULTS_MESSAGE)
         else:
-            await message.reply("Вы отправили пустое сообщение.")
+            await message.reply(config.EMPTY_REQUEST_MESSAGE)
 
     except Exception as e:
         await bot.send_message("473513901", shield(str(e)))
         await bot.send_message("391043684", shield(str(e)))
         print(e)
-        await message.reply(f"У нас что-то сломалось, попробуйте позже.\nP.S. я уже пнул админа)\nЕсли интересно, "
-                            f"то ошибка - {shield(str(e))}")
+
+        error_msg = shield(str(e))
+
+        await message.reply(config.ERROR_MESSAGE + error_msg)
 
 
 def search_engine(text):
@@ -82,8 +81,7 @@ def search_engine(text):
 def update_videos():
     global last_update, videos
 
-    res = youtube.channels().list(id="UC_hvS-IJ_SY04Op14v3l4Lg",
-                                  part='contentDetails').execute()
+    res = youtube.channels().list(id=config.CHANNEL_ID, part='contentDetails').execute()
 
     playlist_id = res['items'][0]['contentDetails']['relatedPlaylists']['uploads']
     next_page_token = None
