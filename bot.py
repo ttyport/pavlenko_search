@@ -58,11 +58,11 @@ async def search(message: types.Message):
             await message.reply("Вы отправили пустое сообщение.")
 
     except Exception as e:
-        await bot.send_message("473513901", e)
-        await bot.send_message("391043684", e)
+        await bot.send_message("473513901", shield(str(e)))
+        await bot.send_message("391043684", shield(str(e)))
         print(e)
         await message.reply(f"У нас что-то сломалось, попробуйте позже.\nP.S. я уже пнул админа)\nЕсли интересно, "
-                            f"то ошибка - {e}")
+                            f"то ошибка - {shield(str(e))}")
 
 
 def search_engine(text):
@@ -128,6 +128,14 @@ def update_videos():
     videos = new_videos
 
     return new_videos
+
+def shield(text):
+    for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
+
+        if char in text:
+            key_list = text.split(char)
+            text = f'\\{char}'.join(_ for _ in key_list)
+    return text
 
 
 executor.start_polling(dp)
