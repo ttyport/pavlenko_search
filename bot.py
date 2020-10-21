@@ -65,6 +65,7 @@ async def search_handler(message: types.Message):
 
 def search_engine(text):
     '''Searches for videos by request'''
+    # getting rid of /search command in the beginning
     words = text.split()
 
     if len(words) <= 1:
@@ -75,6 +76,7 @@ def search_engine(text):
     to_return = ''
 
     for key in videos.keys():
+        # selecting the videos which contain text
         if text.lower() in key.lower():
             key1 = shield(key)
             to_return += f"[{key1}]({videos[key]})\n\n"
