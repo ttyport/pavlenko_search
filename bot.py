@@ -63,19 +63,14 @@ def search_engine(text):
 
     text = ' '.join(words[1:])
 
-    str_to_return = str()
+    to_return = ''
+
     for key in videos.keys():
         if text.lower() in key.lower():
-            key1 = key
-
-            for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
-                if char in key:
-                    key_list = key1.split(char)
-                    key1 = f'\\{char}'.join(_ for _ in key_list)
-
-            str_to_return = str_to_return + \
-                f"[{key1}]" + f"({videos[key]})" + "\n\n"
-    return str_to_return
+            key1 = shield(key)
+            to_return += f"[{key1}]({videos[key]})\n\n"
+            
+    return to_return
 
 
 def update_videos():
