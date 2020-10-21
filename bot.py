@@ -57,8 +57,12 @@ async def search(message: types.Message):
         else:
             await message.reply("Вы отправили пустое сообщение.")
 
-    except:
-        await message.reply("У нас что-то сломалось, попробуйте позже.\nP.S. я уже пнул админа)")
+    except Exception as e:
+        await bot.send_message("473513901", e)
+        await bot.send_message("391043684", e)
+        print(e)
+        await message.reply(f"У нас что-то сломалось, попробуйте позже.\nP.S. я уже пнул админа)\nЕсли интересно, "
+                            f"то ошибка - {e}")
 
 
 def search_engine(text):
