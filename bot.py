@@ -1,3 +1,8 @@
+'''
+Main application module
+'''
+
+
 from datetime import datetime
 from aiogram import Bot, Dispatcher, executor, types
 from googleapiclient.discovery import build
@@ -14,16 +19,19 @@ videos = {}
 
 @bot_dispatcher.message_handler(commands=['start'])
 async def welcome_handler(message: types.Message):
+    '''Sends welcome message on /start command'''
     await message.reply(config.WELCOME_MESSAGE)
 
 
 @bot_dispatcher.message_handler(commands=['help'])
 async def help_handler(message: types.Message):
+    '''Sends help message on /help command'''
     await message.reply(config.HELP_MESSAGE)
 
 
 @bot_dispatcher.message_handler(commands=['search'])
 async def search_handler(message: types.Message):
+    '''Sends a list of links to videos or an error message, if request was incorrect'''
     try:
         global last_update
 
@@ -56,6 +64,7 @@ async def search_handler(message: types.Message):
 
 
 def search_engine(text):
+    '''Searches for videos by request'''
     words = text.split()
 
     if len(words) <= 1:
@@ -74,6 +83,7 @@ def search_engine(text):
 
 
 def update_videos():
+    '''Updates dict of videos'''
     global last_update, videos
 
     res = youtube.channels().list(id=config.CHANNEL_ID, part='contentDetails').execute()
@@ -104,6 +114,7 @@ def update_videos():
 
 
 def shield(text):
+    '''Shields the text (places double slash before special symbols)'''
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
         text = text.replace(char, '\\' + char)
     return text
