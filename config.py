@@ -1,5 +1,6 @@
 API_KEY = ''
 BOT_TOKEN = ''
+BOT_USERNAME = ''
 CHANNEL_ID = 'UC_hvS-IJ_SY04Op14v3l4Lg'
 
 WELCOME_MESSAGE = 'Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.'
