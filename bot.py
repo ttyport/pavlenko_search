@@ -52,7 +52,6 @@ async def search(message: types.Message):
         print(e)
 
         error_msg = shield(str(e))
-
         await message.reply(config.ERROR_MESSAGE + error_msg)
 
 
