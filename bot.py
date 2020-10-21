@@ -13,17 +13,17 @@ videos = {}
 
 
 @bot_dispatcher.message_handler(commands=['start'])
-async def send_welcome(message: types.Message):
+async def welcome_handler(message: types.Message):
     await message.reply(config.WELCOME_MESSAGE)
 
 
 @bot_dispatcher.message_handler(commands=['help'])
-async def help(message: types.Message):
+async def help_handler(message: types.Message):
     await message.reply(config.HELP_MESSAGE)
 
 
 @bot_dispatcher.message_handler(commands=['search'])
-async def search(message: types.Message):
+async def search_handler(message: types.Message):
     try:
         global last_update
 
