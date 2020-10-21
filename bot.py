@@ -1,6 +1,6 @@
+from datetime import datetime
 from aiogram import Bot, Dispatcher, executor, types
 from googleapiclient.discovery import build
-from datetime import datetime
 import config
 
 youtube = build('youtube', 'v3', developerKey=config.API_KEY)
