@@ -39,7 +39,7 @@ async def search(message: types.Message):
         if last_update is None:
             update_videos()
 
-        since_update_str = str(datetime.now() - last_update)
+        since_update_str = get_hours(datetime.now() - last_update)
 
         if int(since_update_str[:since_update_str.index(":")]) >= 1:
             update_videos()
@@ -128,6 +128,13 @@ def update_videos():
     videos = new_videos
 
     return new_videos
+
+
+def get_hours(duration):
+    days, seconds = duration.days, duration.seconds
+    hours = days * 24 + seconds // 3600
+    return hours
+
 
 def shield(text):
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
