@@ -39,7 +39,7 @@ async def search_handler(message: types.Message):
             update_videos()
 
 # <<<<<<< master
-#         since_update = datetime.now() - last_update
+         since_update = datetime.now() - last_update
 # =======
 #         since_update_str = get_hours(datetime.now() - last_update)
 # >>>>>>> master
