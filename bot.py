@@ -38,7 +38,11 @@ async def search_handler(message: types.Message):
         if last_update is None:
             update_videos()
 
-        since_update = datetime.now() - last_update
+# <<<<<<< master
+#         since_update = datetime.now() - last_update
+# =======
+#         since_update_str = get_hours(datetime.now() - last_update)
+# >>>>>>> master
 
         # if haven't been updated in 24 hours
         if since_update.total_seconds() >= 60 * 60 * 24:
@@ -118,6 +122,15 @@ def update_videos():
     return new_videos
 
 
+# <<<<<<< master
+# =======
+# def get_hours(duration):
+#     days, seconds = duration.days, duration.seconds
+#     hours = days * 24 + seconds // 3600
+#     return hours
+
+
+# >>>>>>> master
 def shield(text):
     '''Shields the text (places double slash before special symbols)'''
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
