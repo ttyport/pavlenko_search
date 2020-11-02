@@ -1,0 +1,2 @@
+aiogram==2.10.1
+google_api_python_client==1.12.4

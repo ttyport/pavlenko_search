@@ -1,123 +1,115 @@
+'''
+Main application module
+'''
+
+
+from datetime import datetime
 from aiogram import Bot, Dispatcher, executor, types
 from googleapiclient.discovery import build
-from datetime import datetime
+import config
 
-api = "token"
+youtube = build('youtube', 'v3', developerKey=config.API_KEY)
 
-youtube = build('youtube', 'v3', developerKey=api)
-
-bot = Bot(token="token")
+bot = Bot(token=config.BOT_TOKEN)
+bot_dispatcher = Dispatcher(bot)
 
 last_update = None
-
 videos = {}
 
-dp = Dispatcher(bot)
+
+@bot_dispatcher.message_handler(commands=['start'])
+async def welcome_handler(message: types.Message):
+    '''Sends welcome message on /start command'''
+    await message.reply(config.WELCOME_MESSAGE)
 
 
-@dp.message_handler(commands=['start'])
-async def send_welcome(message: types.Message):
-
-    await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.")
-
-
-@dp.message_handler(commands=['help'])
-async def help(message: types.Message):
-
-    await message.reply("Привет, напиши мне пару слов из названия видео, а я отправлю тебе ссылку на него.\n"
-                        "Использование:\n"
-                        "/search <то, что хотите найти>\n"
-                        "@Zhoprozhag - админ")
+@bot_dispatcher.message_handler(commands=['help'])
+async def help_handler(message: types.Message):
+    '''Sends help message on /help command'''
+    await message.reply(config.HELP_MESSAGE)
 
 
-@dp.message_handler(commands=['search'])
-async def search(message: types.Message):
-
+@bot_dispatcher.message_handler(commands=['search'])
+async def search_handler(message: types.Message):
+    '''Sends a list of links to videos or an error message, if request was incorrect'''
     try:
         global last_update
 
         if last_update is None:
             update_videos()
 
-        since_update_str = get_hours(datetime.now() - last_update)
+# <<<<<<< master
+#         since_update = datetime.now() - last_update
+# =======
+#         since_update_str = get_hours(datetime.now() - last_update)
+# >>>>>>> master
 
-        if int(since_update_str[:since_update_str.index(":")]) >= 1:
+        # if haven't been updated in 24 hours
+        if since_update.total_seconds() >= 60 * 60 * 24:
             update_videos()
 
         reply = search_engine(message.text)
 
         if reply != "empty":
-
-            if len(reply) != 0 and reply != "empty":
-                await message.reply(search_engine(message.text), parse_mode="MarkdownV2", disable_web_page_preview=True)
-
+            if len(reply) != 0:
+                await message.reply(search_engine(message.text),
+                                    parse_mode="MarkdownV2",
+                                    disable_web_page_preview=True)
             else:
-                await message.reply("К сожалению, ничего не нашлось...")
-
+                await message.reply(config.NO_RESULTS_MESSAGE)
         else:
-            await message.reply("Вы отправили пустое сообщение.")
+            await message.reply(config.EMPTY_REQUEST_MESSAGE)
 
     except Exception as e:
-        await bot.send_message("473513901", shield(str(e)))
-        await bot.send_message("391043684", shield(str(e)))
+        for owner in config.BOT_OWNERS:
+            await bot.send_message(owner, shield(str(e)))
+
         print(e)
-        await message.reply(f"У нас что-то сломалось, попробуйте позже.\nP.S. я уже пнул админа)\nЕсли интересно, "
-                            f"то ошибка - {shield(str(e))}")
+
+        error_msg = shield(str(e))
+        await message.reply(config.ERROR_MESSAGE + error_msg)
 
 
 def search_engine(text):
+    '''Searches for videos by request'''
+    # getting rid of /search command in the beginning
+    words = text.split()
 
-    if "/search" in text and "/search@pavlenko_search_bot" not in text:
-        text = text[8:]
+    if len(words) <= 1:
+        return "empty"
 
-    elif "/search@pavlenko_search_bot" in text:
-        text = text[28:]
+    text = ' '.join(words[1:])
 
-    if len(text) > 0:
+    to_return = ''
 
-        str_to_return = str()
+    for key in videos.keys():
+        # selecting the videos which contain text
+        if text.lower() in key.lower():
+            key1 = shield(key)
+            to_return += f"[{key1}]({videos[key]})\n\n"
 
-        for key in videos.keys():
-
-            if text.lower() in key.lower():
-                key1 = key
-
-                for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
-
-                    if char in key:
-                        key_list = key1.split(char)
-                        key1 = f'\\{char}'.join(_ for _ in key_list)
-
-                str_to_return = str_to_return + f"[{key1}]" + f"({videos[key]})" + "\n\n"
-
-        return str_to_return
-
-    return "empty"
+    return to_return
 
 
 def update_videos():
-
+    '''Updates dict of videos'''
     global last_update, videos
 
-    res = youtube.channels().list(id="UC_hvS-IJ_SY04Op14v3l4Lg",
-                                  part='contentDetails').execute()
+    res = youtube.channels().list(id=config.CHANNEL_ID, part='contentDetails').execute()
 
     playlist_id = res['items'][0]['contentDetails']['relatedPlaylists']['uploads']
     next_page_token = None
     new_videos = {}
 
     while 1:
-
         res = youtube.playlistItems().list(playlistId=playlist_id,
                                            part='snippet',
                                            maxResults=50,
                                            pageToken=next_page_token).execute()
-
-        for i in range(len(res["items"])):
-
-            video_id = res["items"][i]["snippet"]["resourceId"]["videoId"]
-            video_name = res["items"][i]['snippet']['title']
-            new_videos[video_name] = f"https://www.youtube.com/watch?v={video_id}"
+        for item in res['items']:
+            video_id = item['snippet']['resourceId']['videoId']
+            video_title = item['snippet']['title']
+            new_videos[video_title] = f"https://www.youtube.com/watch?v={video_id}"
 
         next_page_token = res.get('nextPageToken')
 
@@ -130,19 +122,21 @@ def update_videos():
     return new_videos
 
 
-def get_hours(duration):
-    days, seconds = duration.days, duration.seconds
-    hours = days * 24 + seconds // 3600
-    return hours
+# <<<<<<< master
+# =======
+# def get_hours(duration):
+#     days, seconds = duration.days, duration.seconds
+#     hours = days * 24 + seconds // 3600
+#     return hours
 
 
+# >>>>>>> master
 def shield(text):
+    '''Shields the text (places double slash before special symbols)'''
     for char in '!@#$%^&*()-=_+/?,.<>|:"№;':
-
-        if char in text:
-            key_list = text.split(char)
-            text = f'\\{char}'.join(_ for _ in key_list)
+        text = text.replace(char, '\\' + char)
     return text
 
 
-executor.start_polling(dp)
+if __name__ == "__main__":
+    executor.start_polling(bot_dispatcher)
