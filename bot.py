@@ -38,11 +38,7 @@ async def search_handler(message: types.Message):
         if last_update is None:
             update_videos()
 
-# <<<<<<< master
-         since_update = datetime.now() - last_update
-# =======
-#         since_update_str = get_hours(datetime.now() - last_update)
-# >>>>>>> master
+         since_update_str = get_hours(datetime.now() - last_update)
 
         # if haven't been updated in 24 hours
         if since_update.total_seconds() >= 60 * 60 * 24:
